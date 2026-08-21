@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Bölüm — HubLand</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#070a12;color:#f6f8ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+.app{max-width:650px;margin:auto;padding:16px 14px 40px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+h1{margin:0;font-size:25px}.sub{color:#96a2b9;font-size:12px}
+.card{background:#111827;border:1px solid #27344d;border-radius:20px;padding:15px;margin:10px 0;box-shadow:0 16px 45px #0005}
+.field{margin:10px 0}.field label{display:block;font-size:12px;font-weight:800;color:#aab5c9;margin-bottom:6px}
+input,select{width:100%;background:#0a101d;color:#fff;border:1px solid #2b3954;border-radius:12px;padding:11px;outline:none}
+input:invalid{border-color:#d94d64}
+button{border:0;border-radius:12px;padding:11px 14px;background:#202d47;color:#fff;font-weight:900}
+button.primary{background:linear-gradient(135deg,#6754ff,#4c8cff)}
+button.danger{background:#3a1720;color:#ffb1bd}
+button:disabled{opacity:.5}
+.hidden{display:none!important}
+.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:#18243a;border:1px solid #293753;padding:7px 10px;border-radius:999px;font-size:12px}
+.list{display:grid;gap:8px}
+.table{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0c1321;border:1px solid #25324a;border-radius:15px;padding:12px}
+.table small{display:block;color:#9aa7bd;margin-top:4px}.table b{display:block}
+.players{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.player{padding:14px;background:#0b1220;border:1px solid #26334c;border-radius:15px}
+.player.me{border-color:#6d5cff}.player strong{display:block}.player span{color:#99a5bb;font-size:12px}
+.big{font-size:40px;font-weight:1000;text-align:center;margin:14px 0}
+.dice{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.die{background:#0a101c;border:1px solid #2b3852;border-radius:18px;text-align:center;padding:16px}
+.die b{font-size:40px}.calc{font-size:18px;text-align:center;margin:14px 0}
+.notice{text-align:center;color:#aeb9cc;min-height:24px}.actions{display:grid;gap:8px}
+.history{max-height:220px;overflow:auto;display:grid;gap:6px}
+.history div{padding:8px 10px;background:#0b1220;border-radius:10px;color:#aab5c9;font-size:12px}
+.error{color:#ff9aaa;background:#2a1018;border:1px solid #5b2732;border-radius:12px;padding:10px;font-size:13px;margin-top:10px}
+@media(max-width:420px){.players{grid-template-columns:1fr}.row{display:grid;grid-template-columns:1fr 1fr}.row>*{width:100%}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><h1>🎲 Bölüm</h1><div class="sub">Şansın hesabı vardır.</div></div>
+    <button id="backBtn">HubLand</button>
+  </div>
+
+  <div id="authError" class="error hidden"></div>
+
+  <section id="home">
+    <div class="card">
+      <h2>Yeni Masa</h2>
+      <div class="field"><label>Masa adı</label><input id="tableName" maxlength="32" placeholder="Örn. Akşam Masası"></div>
+      <div class="field"><label>Zarın en düşük değeri (1–30)</label><input id="minDie" type="number" min="1" max="30" step="1" value="1"></div>
+      <div class="field"><label>Zarın en yüksek değeri (1–30)</label><input id="maxDie" type="number" min="1" max="30" step="1" value="6"></div>
+      <div class="field"><label>Her tarafın pul sayısı (18–100)</label><input id="pieceCount" type="number" min="18" max="100" step="1" value="18"></div>
+      <div class="field"><label>Masa türü</label><select id="visibility"><option value="public">Public</option><option value="private">Private</option></select></div>
+      <div class="field hidden" id="codeField"><label>Masa kodu</label><input id="tableCode" maxlength="24" placeholder="Örn. KAPI-42"></div>
+      <button id="createBtn" class="primary" style="width:100%">Masa Aç</button>
+      <div id="createError" class="error hidden"></div>
+    </div>
+
+    <div class="card"><h2>Public Masalar</h2><div id="tableList" class="list"><div class="sub">Masalar yükleniyor…</div></div></div>
+
+    <div class="card">
+      <h2>Kodla Gir</h2>
+      <div class="row"><input id="joinCode" maxlength="24" placeholder="Masa kodu"><button id="joinCodeBtn" class="primary">Katıl</button></div>
+    </div>
+  </section>
+
+  <section id="room" class="hidden">
+    <div class="card">
+      <div class="pills"><span class="pill" id="roomVisibility"></span><span class="pill" id="roomRules"></span><span class="pill" id="roomStatus"></span></div>
+      <h2 id="roomTitle">Masa</h2>
+      <div id="players" class="players"></div>
+    </div>
+
+    <div id="gameCard" class="card hidden">
+      <div class="notice" id="turnNotice"></div>
+      <div class="big" id="pieceCounts">18 — 18</div>
+      <div class="sub" style="text-align:center">İlk oyuncu · İkinci oyuncu</div>
+      <div class="actions" style="margin-top:14px"><button id="startRollBtn" class="primary">Başlangıç Atımı</button></div>
+
+      <div id="roundArea" class="hidden">
+        <div class="dice">
+          <div class="die"><span>Zar 1</span><b id="die1">—</b></div>
+          <div class="die"><span>Zar 2</span><b id="die2">—</b></div>
+        </div>
+        <div class="calc" id="calc">—</div>
+        <div class="actions">
+          <button id="rollBtn" class="primary">Atım Yap</button>
+          <div id="doubleActions" class="row hidden">
+            <button id="fixDouble">Sabitle · 1 Pul</button>
+            <button id="upgradeDouble" class="primary">Yükselt · Tekrar At</button>
+          </div>
+        </div>
+        <div class="notice" id="resultNotice"></div>
+      </div>
+
+      <h3>Hesap Geçmişi</h3><div id="history" class="history"></div>
+    </div>
+
+    <div class="card"><button id="leaveBtn" class="danger" style="width:100%">Masadan Ayrıl</button></div>
+  </section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let hubUid=null,hubName='Oyuncu',current=null,currentId=null;
+let reqSeq=0,waiting=new Map();
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function setView(id){$('home').classList.toggle('hidden',id!=='home');$('room').classList.toggle('hidden',id!=='room')}
+function errText(x){return x?.message||'Bir hata oluştu.'}
+function showErr(el,msg){$(el).textContent=msg;$(el).classList.remove('hidden')}
+function hideErr(el){$(el).classList.add('hidden')}
+
+function rpc(op,data={}){
+  return new Promise((resolve,reject)=>{
+    const requestId='b'+(++reqSeq)+'_'+Date.now();
+    waiting.set(requestId,{resolve,reject});
+    parent.postMessage({type:'BOLUM_REQUEST',requestId,op,data},'*');
+    setTimeout(()=>{if(waiting.has(requestId)){waiting.delete(requestId);reject(new Error('HubLand yanıt vermedi.'))}},10000);
+  });
+}
+
+window.addEventListener('message',e=>{
+  const d=e.data||{};
+  if(d.type==='HUBLAND_AUTH_CONTEXT'){
+    hubUid=d.uid||null;hubName=d.displayName||'Oyuncu';
+    if(!hubUid)showErr('authError','HubLand hesabı alınamadı. Oyunu HubLand içinden aç.');
+    else hideErr('authError');
+    return;
+  }
+  if(d.type==='BOLUM_RESPONSE'){
+    const p=waiting.get(d.requestId);if(!p)return;
+    waiting.delete(d.requestId);
+    d.ok?p.resolve(d.data):p.reject(new Error(d.error||'İşlem başarısız.'));
+    return;
+  }
+  if(d.type==='BOLUM_TABLE_LIST'){renderTables(d.tables||[]);return}
+  if(d.type==='BOLUM_TABLE'){if(d.table){current=d.table;currentId=d.table.id;renderRoom()}else{current=null;currentId=null;setView('home')}}
+});
+
+function validateSettings(){
+  const name=$('tableName').value.trim();
+  const min=Number($('minDie').value),max=Number($('maxDie').value),pieces=Number($('pieceCount').value);
+  if(!name)return 'Masa adı boş olamaz.';
+  if(!Number.isInteger(min)||min<1||min>30)return 'En düşük zar 1–30 arasında tam sayı olmalı.';
+  if(!Number.isInteger(max)||max<1||max>30)return 'En yüksek zar 1–30 arasında tam sayı olmalı.';
+  if(max<min)return 'En yüksek zar, en düşük zardan küçük olamaz.';
+  if(!Number.isInteger(pieces)||pieces<18||pieces>100)return 'Pul sayısı 18–100 arasında tam sayı olmalı.';
+  const visibility=$('visibility').value,code=$('tableCode').value.trim();
+  if(visibility==='private'&&code.length<3)return 'Private masa için en az 3 karakterlik bir kod yaz.';
+  return {name,min,max,pieces,visibility,code:visibility==='private'?code:null};
+}
+
+async function createTable(){
+  hideErr('createError');
+  if(!hubUid)return showErr('createError','HubLand hesabı henüz hazır değil. Birkaç saniye bekleyip tekrar dene.');
+  const v=validateSettings();if(typeof v==='string')return showErr('createError',v);
+  try{
+    const r=await rpc('CREATE_TABLE',v);
+    await rpc('OPEN_TABLE',{id:r.id});
+  }catch(e){showErr('createError',errText(e))}
+}
+
+function renderTables(tables){
+  const list=$('tableList');list.innerHTML='';
+  if(!tables.length){list.innerHTML='<div class="sub">Şu anda public masa yok.</div>';return}
+  tables.forEach(t=>{
+    const el=document.createElement('div');el.className='table';
+    const full=(t.playerUids||[]).length>=2;
+    el.innerHTML='<div><b>'+esc(t.name||'Masa')+'</b><small>'+esc(t.ownerName||'Oyuncu')+' · '+t.minDie+'–'+t.maxDie+' zar · '+t.pieces+' pul · '+(t.playerUids?.length||0)+'/2</small></div><button class="join primary" '+(full?'disabled':'')+'>'+ (full?'Dolu':'Katıl')+'</button>';
+    el.querySelector('button').onclick=()=>joinTable(t.id);list.appendChild(el)
+  });
+}
+
+async function joinTable(id){
+  try{await rpc('JOIN_TABLE',{id});await rpc('OPEN_TABLE',{id})}catch(e){showErr('authError',errText(e))}
+}
+async function joinByCode(){
+  const code=$('joinCode').value.trim();if(!code)return;
+  try{const r=await rpc('JOIN_CODE',{code});await rpc('OPEN_TABLE',{id:r.id})}catch(e){showErr('authError',errText(e))}
+}
+
+function meIndex(){return(current?.players||[]).findIndex(p=>p.uid===hubUid)}
+function isMyTurn(){return !!current&&current.turn===hubUid}
+
+function renderRoom(){
+  if(!current){setView('home');return}
+  setView('room');
+  const ps=current.players||[];
+  $('roomTitle').textContent=current.name||'Masa';
+  $('roomVisibility').textContent=current.visibility==='public'?'Public':'Private · '+(current.code||'');
+  $('roomRules').textContent=current.minDie+'–'+current.maxDie+' zar · '+current.pieces+' pul';
+  $('roomStatus').textContent=current.status==='waiting'?'Oyuncu bekleniyor':current.status==='finished'?'Bitti':'Oyun';
+  $('players').innerHTML=ps.map(p=>'<div class="player '+(p.uid===hubUid?'me':'')+'"><strong>'+esc(p.name||'Oyuncu')+'</strong><span>'+p.pieces+' pul</span></div>').join('');
+  $('pieceCounts').textContent=(ps[0]?.pieces??current.pieces)+' — '+(ps[1]?.pieces??current.pieces);
+  $('gameCard').classList.toggle('hidden',ps.length<2||current.status==='finished');
+  $('startRollBtn').classList.toggle('hidden',ps.length<2||current.round>0||!!current.turn);
+  $('roundArea').classList.toggle('hidden',ps.length<2||!current.turn);
+  $('turnNotice').textContent=ps.length<2?'İkinci oyuncu bekleniyor…':current.turn?('Sıra: '+(ps.find(p=>p.uid===current.turn)?.name||'Oyuncu')):'Başlangıç Atımı gerekiyor.';
+  $('rollBtn').disabled=!isMyTurn();
+  $('doubleActions').classList.toggle('hidden',!(current.lastResult?.doublePending&&isMyTurn()));
+  if(current.dice){$('die1').textContent=current.dice[0];$('die2').textContent=current.dice[1];$('calc').textContent=current.lastResult?.text||'—'}
+  else{$('die1').textContent='—';$('die2').textContent='—';$('calc').textContent='—'}
+  $('resultNotice').textContent=current.lastResult?.notice||'';
+  $('history').innerHTML=(current.history||[]).slice().reverse().map(x=>'<div>'+esc(x)+'</div>').join('');
+}
+
+$('visibility').onchange=e=>$('codeField').classList.toggle('hidden',e.target.value!=='private');
+$('createBtn').onclick=()=>createTable();
+$('joinCodeBtn').onclick=()=>joinByCode();
+$('startRollBtn').onclick=()=>rpc('START_ROLL').catch(e=>showErr('authError',errText(e)));
+$('rollBtn').onclick=()=>rpc('ROLL').catch(e=>showErr('authError',errText(e)));
+$('fixDouble').onclick=()=>rpc('DOUBLE_FIX').catch(e=>showErr('authError',errText(e)));
+$('upgradeDouble').onclick=()=>rpc('DOUBLE_UPGRADE').catch(e=>showErr('authError',errText(e)));
+$('leaveBtn').onclick=async()=>{try{await rpc('LEAVE_TABLE');setView('home');current=null;currentId=null}catch(e){showErr('authError',errText(e))}};
+$('backBtn').onclick=()=>parent.postMessage({type:'BOLUM_CLOSE'},'*');
+
+window.addEventListener('load',()=>{
+  parent.postMessage({type:'HUBLAND_REQUEST_AUTH_CONTEXT'},'*');
+  rpc('SUBSCRIBE_PUBLIC').catch(e=>showErr('authError',errText(e)));
+});
+</script>
+</body>
+</html>
