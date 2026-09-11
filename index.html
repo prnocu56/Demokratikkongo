@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Bölüm</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#070a12;--card:#101827;--card2:#0b1220;--line:#29364f;--muted:#9aa7bc;--accent:#6754ff;--good:#6ee7b7}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#17203a 0,#070a12 48%);color:#f7f8ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.app{max-width:760px;margin:auto;padding:16px 14px 34px}
+button,input{font:inherit}
+button{border:1px solid var(--line);background:#18233a;color:#fff;border-radius:13px;padding:11px 14px;font-weight:900;cursor:pointer}
+button:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(1)}
+.primary{background:linear-gradient(135deg,#6754ff,#4d8cff);border-color:#7467ff}
+.ghost{background:#101827}.danger{background:#341923;border-color:#62303d;color:#ffc1cb}
+.hidden{display:none!important}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.brand{font-size:28px;font-weight:1000;letter-spacing:-.5px}.sub{color:var(--muted);font-size:12px}
+.card{background:linear-gradient(180deg,#121b2d,#0d1524);border:1px solid var(--line);border-radius:22px;padding:15px;margin:10px 0;box-shadow:0 18px 55px #0007}
+.homeGrid{display:grid;gap:10px}.field{margin:8px 0}.field label{display:block;color:#aeb9cb;font-size:12px;font-weight:900;margin:0 0 6px}
+input,select{width:100%;border:1px solid #2a3954;border-radius:13px;background:#080e19;color:#fff;padding:11px 12px;outline:none}
+input:focus,select:focus{border-color:#7164ff;box-shadow:0 0 0 3px #6754ff22}
+.error{background:#2b1018;border:1px solid #62303d;color:#ffabb8;padding:10px;border-radius:12px;font-size:13px;margin-top:10px}
+.tableList{display:grid;gap:8px}.tableRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid #26334c;background:#0a111e;border-radius:15px}
+.tableRow small{display:block;color:var(--muted);margin-top:3px}.tableRow b{display:block}
+.codeRow{display:grid;grid-template-columns:1fr auto;gap:8px}
+.rules{display:flex;gap:7px;flex-wrap:wrap}.pill{padding:6px 9px;border-radius:999px;background:#18243a;border:1px solid #293750;color:#c3ccdb;font-size:11px;font-weight:900}
+
+.roomHead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.playerMini{min-width:0}.playerMini.right{text-align:right}.playerName{font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.playerCount{font-size:12px;color:var(--muted)}.versus{text-align:center;font-weight:1000;color:#77849b}
+.turnLine{text-align:center;font-weight:1000;margin:9px 0 12px}.turnLine span{color:#9fa9ff}
+.statsGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{background:#0a111e;border:1px solid #25324a;border-radius:16px;padding:13px;min-height:82px}
+.stat .label{font-size:11px;color:var(--muted);font-weight:900}.stat .value{font-size:30px;font-weight:1000;margin-top:2px}
+.diceArea{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative}
+.die{background:#0a111e;border:1px solid #29364f;border-radius:18px;padding:15px;text-align:center;min-height:108px;display:flex;flex-direction:column;justify-content:center}
+.die .label{font-size:11px;color:var(--muted);font-weight:900}.die .num{font-size:48px;line-height:1.05;font-weight:1000;margin-top:5px}
+.result{margin:12px 0;text-align:center;border-radius:15px;padding:12px;background:#0a111e;border:1px solid #27344c}
+.result .label{display:block;color:var(--muted);font-size:11px;font-weight:900}.result .num{display:block;font-size:32px;font-weight:1000}
+.rollWrap{text-align:center;margin:10px 0}.rollWrap button{min-width:170px}.startWrap{display:flex;justify-content:center;margin-top:10px}.startWrap button{width:100%;max-width:300px}
+.infoGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.infoCard{background:#0a111e;border:1px solid #26334c;border-radius:18px;padding:14px;min-width:0}
+.infoCard.mine{border-color:#5c55b9;box-shadow:inset 0 0 0 1px #6754ff22}
+.infoTitle{font-weight:1000;margin-bottom:8px}.infoRow{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #1c2638;font-size:12px}.infoRow:last-child{border-bottom:0}.infoRow span:first-child{color:var(--muted)}.infoRow span:last-child{font-weight:900;text-align:right;overflow:hidden;text-overflow:ellipsis}
+.log{background:#090f1a;border:1px solid #26334c;border-radius:18px;padding:12px;max-height:250px;overflow:auto;display:grid;gap:6px}
+.logItem{background:#0d1524;border-radius:11px;padding:8px 10px;color:#aeb9ca;font-size:12px;line-height:1.4}
+.chat{margin-top:10px}.chatList{height:210px;overflow:auto;display:grid;gap:7px;padding:2px}.msg{max-width:86%;padding:8px 10px;border-radius:13px;background:#172238;border:1px solid #273650;font-size:12px}.msg.mine{margin-left:auto;background:#25205a;border-color:#554bc4}.msgName{font-size:10px;color:#9da9c0;font-weight:900;margin-bottom:2px}.chatInput{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:8px}
+.empty{text-align:center;color:var(--muted);padding:16px 4px;font-size:12px}
+@media(max-width:520px){.infoGrid{grid-template-columns:1fr}.statsGrid{grid-template-columns:1fr 1fr}.roomHead{grid-template-columns:1fr auto 1fr}.brand{font-size:25px}}
+
+.sketchGrid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-areas:"one four nine" "five six two" "eight eight seven" "three three seven";gap:10px;margin-top:10px}.a1{grid-area:one}.a2{grid-area:two}.a3{grid-area:three}.a4{grid-area:four}.a5{grid-area:five}.a6{grid-area:six}.a7{grid-area:seven}.a8{grid-area:eight}.a9{grid-area:nine}.sketchStat{height:100%;min-height:92px}.diceBox{height:100%;min-height:108px;background:#0a111e;border:1px solid #29364f;border-radius:18px;padding:14px;text-align:center;display:flex;flex-direction:column;justify-content:center}.diceBox .label{font-size:11px;color:var(--muted);font-weight:900}.diceBox .num{font-size:48px;line-height:1.05;font-weight:1000;margin-top:5px}.infoSketch{height:100%;min-height:150px}.rollCenter{text-align:center;margin:10px 0}.rollCenter button{width:100%;max-width:300px}.startCenter{text-align:center;margin-top:10px}.startCenter button{width:100%;max-width:300px}@media(max-width:520px){.sketchGrid{grid-template-columns:1fr 1fr;grid-template-areas:"one four" "nine two" "five six" "eight seven" "eight seven" "three three"}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><div class="brand">🎲 Bölüm</div><div class="sub">Şansın hesabı vardır.</div></div>
+    <button id="hubBtn" class="ghost">HubLand</button>
+  </div>
+
+  <div id="globalError" class="error hidden"></div>
+
+  <section id="home">
+    <div class="card">
+      <h2>Yeni Masa</h2>
+      <div class="field"><label>Masa adı</label><input id="tableName" maxlength="32" placeholder="Örn. Akşam Masası"></div>
+      <div class="field"><label>Zarın en düşük değeri (1–30)</label><input id="minDie" type="number" min="1" max="30" step="1" value="1"></div>
+      <div class="field"><label>Zarın en yüksek değeri (1–30)</label><input id="maxDie" type="number" min="1" max="30" step="1" value="6"></div>
+      <div class="field"><label>Her tarafın pul sayısı (18–100)</label><input id="pieceCount" type="number" min="18" max="100" step="1" value="18"></div>
+      <div class="field"><label>Masa türü</label><select id="visibility"><option value="public">Public</option><option value="private">Private</option></select></div>
+      <div class="field hidden" id="codeField"><label>Masa kodu</label><input id="tableCode" maxlength="24" placeholder="Örn. KAPI-42"></div>
+      <button id="createBtn" class="primary" style="width:100%">Masa Aç</button>
+    </div>
+    <div class="card"><h2>Public Masalar</h2><div id="tableList" class="tableList"><div class="empty">Masalar yükleniyor…</div></div></div>
+    <div class="card"><h2>Kodla Gir</h2><div class="codeRow"><input id="joinCode" maxlength="24" placeholder="Masa kodu"><button id="joinCodeBtn" class="primary">Katıl</button></div></div>
+  </section>
+
+  <section id="room" class="hidden">
+<div class="card"><div class="rules"><span id="roomType" class="pill"></span><span id="roomRules" class="pill"></span><span id="roomCodePill" class="pill hidden"></span></div><h2 id="roomTitle">Masa</h2><div class="roomHead"><div class="playerMini"><div id="meName" class="playerName">—</div><div id="mePiecesMini" class="playerCount">— pul</div></div><div class="versus">VS</div><div class="playerMini right"><div id="oppName" class="playerName">Bekleniyor…</div><div id="oppPiecesMini" class="playerCount">— pul</div></div></div><div class="turnLine">Tur: <span id="turnName">Başlangıç bekleniyor</span></div><div id="waitNote" class="empty hidden">İkinci oyuncu bekleniyor…</div></div>
+<div class="sketchGrid">
+<div class="stat sketchStat a1"><div class="label">1 · Bizim pul</div><div id="myPieces" class="value">—</div></div>
+<div class="stat sketchStat a4"><div class="label">4 · Karşı tarafın aldığı</div><div id="oppTaken" class="value">0</div></div>
+<div id="oppInfo" class="infoCard infoSketch a9"><div class="infoTitle">9 · Karşı Taraf Bilgi Kartı</div><div id="oppInfoBody"></div></div>
+<div class="stat sketchStat a5"><div class="label">5 · 1. ZAR</div><div id="die1" class="value">—</div></div>
+<div class="stat sketchStat a6"><div class="label">6 · 2. ZAR</div><div id="die2" class="value">—</div></div>
+<div class="stat sketchStat a2"><div class="label">2 · Karşı tarafın pul</div><div id="oppPieces" class="value">—</div></div>
+<div id="myInfo" class="infoCard infoSketch a8 mine"><div class="infoTitle">8 · Benim Bilgi Kartım</div><div id="myInfoBody"></div></div>
+<div class="result a7" style="margin:0;height:100%;min-height:108px;display:flex;flex-direction:column;justify-content:center"><span class="label">7 · ALINAN SAYI</span><span id="resultNum" class="num">—</span><span id="resultText" class="sub">—</span></div>
+<div class="stat sketchStat a3"><div class="label">3 · Karşı taraftan aldığımız</div><div id="myTaken" class="value">0</div></div>
+</div>
+<div id="gameArea" class="card"><div id="normalRollWrap" class="rollCenter"><button id="rollBtn" class="primary">ROLL</button></div><div id="doubleWrap" class="hidden"><div class="sub" style="text-align:center;margin-bottom:7px">İkiz geldi. Birini seç:</div><div class="codeRow"><button id="doubleFix">1 Pul Al</button><button id="doubleUpgrade" class="primary">Tekrar Roll</button></div></div><div id="startWrap" class="startCenter"><button id="startRollBtn" class="primary">BAŞLANGIÇ ROLL</button></div><div id="startInfo" class="empty">İki oyuncu da başlangıç Roll’una bastığında oyun başlayacak.</div></div>
+<div class="card"><h3>10 · Oyun İşleyişi</h3><div id="log" class="log"><div class="empty">Henüz hareket yok.</div></div></div>
+<div class="card chat"><h3>💬 Masa Chat</h3><div id="chatList" class="chatList"><div class="empty">Mesaj yok.</div></div><div class="chatInput"><input id="chatInput" maxlength="500" placeholder="Mesaj yaz…"><button id="chatSend" class="primary">Gönder</button></div></div>
+<div class="card"><button id="leaveBtn" class="danger" style="width:100%">Masadan Ayrıl</button></div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let uid=null,displayName='Oyuncu',current=null,currentId=null;
+let req=0,waiting=new Map(),startLocalRolled=false;
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function err(msg){$('globalError').textContent=msg;$('globalError').classList.remove('hidden')}
+function clearErr(){$('globalError').classList.add('hidden')}
+function rpc(op,data={}){
+  return new Promise((resolve,reject)=>{
+    const id='b'+(++req)+'_'+Date.now();waiting.set(id,{resolve,reject});
+    parent.postMessage({type:'BOLUM_REQUEST',requestId:id,op,data},'*');
+    setTimeout(()=>{if(waiting.has(id)){waiting.delete(id);reject(new Error('HubLand yanıt vermedi.'))}},12000);
+  })
+}
+window.addEventListener('message',e=>{
+  const d=e.data||{};
+  if(d.type==='HUBLAND_AUTH_CONTEXT'){
+    uid=d.uid||null;displayName=d.displayName||'Oyuncu';
+    if(!uid)err('HubLand hesabı alınamadı. Bölüm\'ü HubLand içinden aç.');
+    else clearErr();
+  }else if(d.type==='BOLUM_RESPONSE'){
+    const p=waiting.get(d.requestId);if(!p)return;waiting.delete(d.requestId);d.ok?p.resolve(d.data):p.reject(new Error(d.error||'İşlem başarısız.'));
+  }else if(d.type==='BOLUM_TABLE_LIST'){renderTables(d.tables||[])}
+  else if(d.type==='BOLUM_TABLE'){current=d.table||null;currentId=current?.id||null;if(current)renderRoom();else{currentId=null;showHome()}}
+  else if(d.type==='BOLUM_CHAT_LIST'){renderChat(d.messages||[])}
+});
+
+function showHome(){$('home').classList.remove('hidden');$('room').classList.add('hidden')}
+function showRoom(){$('home').classList.add('hidden');$('room').classList.remove('hidden')}
+function renderTables(tables){
+  const list=$('tableList');list.innerHTML='';
+  if(!tables.length){list.innerHTML='<div class="empty">Şu anda public masa yok.</div>';return}
+  tables.forEach(t=>{
+    const full=(t.playerUids||[]).length>=2;
+    const row=document.createElement('div');row.className='tableRow';
+    row.innerHTML='<div><b>'+esc(t.name||'Masa')+'</b><small>'+esc(t.ownerName||'Oyuncu')+' · '+t.minDie+'–'+t.maxDie+' zar · '+t.pieces+' pul · '+(t.playerUids?.length||0)+'/2</small></div><button class="primary" '+(full?'disabled':'')+'>'+ (full?'Dolu':'Katıl')+'</button>';
+    row.querySelector('button').onclick=()=>join(t.id);list.appendChild(row);
+  })
+}
+async function join(id){try{clearErr();await rpc('JOIN_TABLE',{id});await rpc('OPEN_TABLE',{id})}catch(e){err(e.message)}}
+async function joinCode(){try{clearErr();await rpc('JOIN_CODE',{code:$('joinCode').value.trim()});}catch(e){err(e.message)}}
+function validate(){
+  const name=$('tableName').value.trim(),min=Number($('minDie').value),max=Number($('maxDie').value),pieces=Number($('pieceCount').value),vis=$('visibility').value,code=$('tableCode').value.trim();
+  if(!name)return 'Masa adı boş olamaz.';
+  if(!Number.isInteger(min)||min<1||min>30)return 'En düşük zar 1–30 arasında tam sayı olmalı.';
+  if(!Number.isInteger(max)||max<1||max>30)return 'En yüksek zar 1–30 arasında tam sayı olmalı.';
+  if(max<min)return 'En yüksek zar, en düşük zardan küçük olamaz.';
+  if(!Number.isInteger(pieces)||pieces<18||pieces>100)return 'Pul sayısı 18–100 arasında tam sayı olmalı.';
+  if(vis==='private'&&code.length<3)return 'Private masa kodu en az 3 karakter olmalı.';
+  return {name,min,max,pieces,visibility:vis,code:vis==='private'?code:null}
+}
+async function create(){
+  try{clearErr();if(!uid)throw new Error('HubLand hesabı hazır değil.');const v=validate();if(typeof v==='string')throw new Error(v);const r=await rpc('CREATE_TABLE',v);await rpc('OPEN_TABLE',{id:r.id})}catch(e){err(e.message)}
+}
+function findMe(){return(current?.players||[]).find(p=>p.uid===uid)}
+function findOpp(){return(current?.players||[]).find(p=>p.uid!==uid)}
+function infoHtml(p){
+  if(!p)return '<div class="empty">Oyuncu bekleniyor…</div>';
+  return '<div class="infoRow"><span>Oyun nicki</span><span>'+esc(p.name||'Oyuncu')+'</span></div>'+
+         '<div class="infoRow"><span>Masadaki kazanılan</span><span>'+Number(p.wins||0)+'</span></div>'+
+         '<div class="infoRow"><span>Alınan pul</span><span>'+Number(p.totalTaken||0)+'</span></div>'+
+         '<div class="infoRow"><span>Kaybedilen pul</span><span>'+Number(p.totalLost||0)+'</span></div>';
+}
+function renderRoom(){
+  showRoom();
+  const ps=current.players||[],me=findMe(),opp=findOpp(),ready=ps.length===2,turnName=current.turn?(ps.find(p=>p.uid===current.turn)?.name||'Oyuncu'):'Başlangıç bekleniyor';
+  $('roomTitle').textContent=current.name||'Masa';
+  $('roomType').textContent=current.visibility==='public'?'Public':'Private';
+  $('roomRules').textContent=current.minDie+'–'+current.maxDie+' zar · '+current.pieces+' pul';
+  $('roomCodePill').classList.toggle('hidden',current.visibility!=='private');$('roomCodePill').textContent=current.visibility==='private'?'Kod: '+(current.code||''):'';
+  $('meName').textContent=me?.name||displayName;$('mePiecesMini').textContent=(me?.pieces??'—')+' pul';
+  $('oppName').textContent=opp?.name||'Bekleniyor…';$('oppPiecesMini').textContent=opp?opp.pieces+' pul':'— pul';
+  $('turnName').textContent=turnName;
+  $('waitNote').classList.toggle('hidden',ready);
+  $('myPieces').textContent=me?.pieces??'—';$('oppPieces').textContent=opp?.pieces??'—';
+  $('myTaken').textContent=me?.totalTaken??0;$('oppTaken').textContent=opp?.totalTaken??0;
+  $('myInfoBody').innerHTML=infoHtml(me);$('oppInfoBody').innerHTML=infoHtml(opp);
+  $('gameArea').classList.toggle('hidden',!ready);
+  $('startWrap').classList.toggle('hidden',!ready||!!current.turn);
+  $('startRollBtn').disabled=!ready||startLocalRolled||!!current.turn;
+  $('startInfo').textContent=current.turn?'Oyun başladı.':(startLocalRolled?"Başlangıç Roll'un yapıldı; diğer oyuncu bekleniyor.":'İki oyuncu da başlangıç Roll’una bastığında oyun başlayacak.');
+  $('normalRollWrap').classList.toggle('hidden',!current.turn);
+  $('rollBtn').disabled=current.turn!==uid;
+  const dp=!!current.lastResult?.doublePending&&current.turn===uid;
+  $('doubleWrap').classList.toggle('hidden',!dp);
+  $('die1').textContent=current.dice?.[0]??'—';$('die2').textContent=current.dice?.[1]??'—';
+  $('resultNum').textContent=current.lastResult?.amount??'—';
+  $('resultText').textContent=current.lastResult?.text||'—';
+  $('log').innerHTML=(current.history||[]).slice().reverse().map(x=>'<div class="logItem">'+esc(x)+'</div>').join('')||'<div class="empty">Henüz hareket yok.</div>';
+}
+function renderChat(messages){
+  const box=$('chatList');box.innerHTML='';
+  if(!messages.length){box.innerHTML='<div class="empty">Mesaj yok.</div>';return}
+  messages.forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.uid===uid?'mine':'');d.innerHTML='<div class="msgName">'+esc(m.name||'Oyuncu')+'</div><div>'+esc(m.text||'')+'</div>';box.appendChild(d)});
+  box.scrollTop=box.scrollHeight;
+}
+async function startRoll(){try{clearErr();startLocalRolled=true;await rpc('START_ROLL')}catch(e){startLocalRolled=false;err(e.message)}}
+async function roll(){try{clearErr();await rpc('ROLL')}catch(e){err(e.message)}}
+async function doubleFix(){try{clearErr();await rpc('DOUBLE_FIX')}catch(e){err(e.message)}}
+async function doubleUpgrade(){try{clearErr();await rpc('DOUBLE_UPGRADE')}catch(e){err(e.message)}}
+async function sendChat(){
+  const text=$('chatInput').value.trim();if(!text)return;
+  try{clearErr();$('chatInput').value='';await rpc('CHAT_SEND',{text})}catch(e){err(e.message)}
+}
+async function leave(){try{await rpc('LEAVE_TABLE');startLocalRolled=false;showHome()}catch(e){err(e.message)}}
+$('visibility').onchange=e=>$('codeField').classList.toggle('hidden',e.target.value!=='private');
+$('createBtn').onclick=create;$('joinCodeBtn').onclick=joinCode;$('startRollBtn').onclick=startRoll;$('rollBtn').onclick=roll;
+$('doubleFix').onclick=doubleFix;$('doubleUpgrade').onclick=doubleUpgrade;$('chatSend').onclick=sendChat;$('chatInput').onkeydown=e=>{if(e.key==='Enter')sendChat()};
+$('leaveBtn').onclick=leave;$('hubBtn').onclick=()=>parent.postMessage({type:'BOLUM_CLOSE'},'*');
+window.addEventListener('load',()=>{parent.postMessage({type:'HUBLAND_REQUEST_AUTH_CONTEXT'},'*');rpc('SUBSCRIBE_PUBLIC').catch(e=>err(e.message))});
+</script>
+</body>
+</html>
