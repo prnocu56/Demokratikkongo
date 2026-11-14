@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Bölüm</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#070a12;--card:#101827;--card2:#0b1220;--line:#29364f;--muted:#9aa7bc;--accent:#6754ff;--good:#6ee7b7}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#17203a 0,#070a12 48%);color:#f7f8ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.app{max-width:760px;margin:auto;padding:16px 14px 34px}
+button,input{font:inherit}
+button{border:1px solid var(--line);background:#18233a;color:#fff;border-radius:13px;padding:11px 14px;font-weight:900;cursor:pointer}
+button:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(1)}
+.primary{background:linear-gradient(135deg,#6754ff,#4d8cff);border-color:#7467ff}
+.ghost{background:#101827}.danger{background:#341923;border-color:#62303d;color:#ffc1cb}
+.hidden{display:none!important}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.brand{font-size:28px;font-weight:1000;letter-spacing:-.5px}.sub{color:var(--muted);font-size:12px}
+.card{background:linear-gradient(180deg,#121b2d,#0d1524);border:1px solid var(--line);border-radius:22px;padding:15px;margin:10px 0;box-shadow:0 18px 55px #0007}
+.homeGrid{display:grid;gap:10px}.field{margin:8px 0}.field label{display:block;color:#aeb9cb;font-size:12px;font-weight:900;margin:0 0 6px}
+input,select{width:100%;border:1px solid #2a3954;border-radius:13px;background:#080e19;color:#fff;padding:11px 12px;outline:none}
+input:focus,select:focus{border-color:#7164ff;box-shadow:0 0 0 3px #6754ff22}
+.error{background:#2b1018;border:1px solid #62303d;color:#ffabb8;padding:10px;border-radius:12px;font-size:13px;margin-top:10px}
+.tableList{display:grid;gap:8px}.tableRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid #26334c;background:#0a111e;border-radius:15px}
+.tableRow small{display:block;color:var(--muted);margin-top:3px}.tableRow b{display:block}
+.codeRow{display:grid;grid-template-columns:1fr auto;gap:8px}
+.rules{display:flex;gap:7px;flex-wrap:wrap}.pill{padding:6px 9px;border-radius:999px;background:#18243a;border:1px solid #293750;color:#c3ccdb;font-size:11px;font-weight:900}
+
+.roomHead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.playerMini{min-width:0}.playerMini.right{text-align:right}.playerName{font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.playerCount{font-size:12px;color:var(--muted)}.versus{text-align:center;font-weight:1000;color:#77849b}
+.turnLine{text-align:center;font-weight:1000;margin:9px 0 12px}.turnLine span{color:#9fa9ff}
+.statsGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{background:#0a111e;border:1px solid #25324a;border-radius:16px;padding:13px;min-height:82px}
+.stat .label{font-size:11px;color:var(--muted);font-weight:900}.stat .value{font-size:30px;font-weight:1000;margin-top:2px}
+.diceArea{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative}
+.die{background:#0a111e;border:1px solid #29364f;border-radius:18px;padding:15px;text-align:center;min-height:108px;display:flex;flex-direction:column;justify-content:center}
+.die .label{font-size:11px;color:var(--muted);font-weight:900}.die .num{font-size:48px;line-height:1.05;font-weight:1000;margin-top:5px}
+.result{margin:12px 0;text-align:center;border-radius:15px;padding:12px;background:#0a111e;border:1px solid #27344c}
+.result .label{display:block;color:var(--muted);font-size:11px;font-weight:900}.result .num{display:block;font-size:32px;font-weight:1000}
+.rollWrap{text-align:center;margin:10px 0}.rollWrap button{min-width:170px}.startWrap{display:flex;justify-content:center;margin-top:10px}.startWrap button{width:100%;max-width:300px}
+.infoGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.infoCard{background:#0a111e;border:1px solid #26334c;border-radius:18px;padding:14px;min-width:0}
+.infoCard.mine{border-color:#5c55b9;box-shadow:inset 0 0 0 1px #6754ff22}
+.infoTitle{font-weight:1000;margin-bottom:8px}.infoRow{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #1c2638;font-size:12px}.infoRow:last-child{border-bottom:0}.infoRow span:first-child{color:var(--muted)}.infoRow span:last-child{font-weight:900;text-align:right;overflow:hidden;text-overflow:ellipsis}
+.log{background:#090f1a;border:1px solid #26334c;border-radius:18px;padding:12px;max-height:250px;overflow:auto;display:grid;gap:6px}
+.logItem{background:#0d1524;border-radius:11px;padding:8px 10px;color:#aeb9ca;font-size:12px;line-height:1.4}
+.chat{margin-top:10px}.chatList{height:210px;overflow:auto;display:grid;gap:7px;padding:2px}.msg{max-width:86%;padding:8px 10px;border-radius:13px;background:#172238;border:1px solid #273650;font-size:12px}.msg.mine{margin-left:auto;background:#25205a;border-color:#554bc4}.msgName{font-size:10px;color:#9da9c0;font-weight:900;margin-bottom:2px}.chatInput{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:8px}
+.empty{text-align:center;color:var(--muted);padding:16px 4px;font-size:12px}
+@media(max-width:520px){.infoGrid{grid-template-columns:1fr}.statsGrid{grid-template-columns:1fr 1fr}.roomHead{grid-template-columns:1fr auto 1fr}.brand{font-size:25px}}
+
+.sketchGrid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-areas:"one four nine" "five six two" "eight eight seven" "three three seven";gap:10px;margin-top:10px}.a1{grid-area:one}.a2{grid-area:two}.a3{grid-area:three}.a4{grid-area:four}.a5{grid-area:five}.a6{grid-area:six}.a7{grid-area:seven}.a8{grid-area:eight}.a9{grid-area:nine}.sketchStat{height:100%;min-height:92px}.diceBox{height:100%;min-height:108px;background:#0a111e;border:1px solid #29364f;border-radius:18px;padding:14px;text-align:center;display:flex;flex-direction:column;justify-content:center}.diceBox .label{font-size:11px;color:var(--muted);font-weight:900}.diceBox .num{font-size:48px;line-height:1.05;font-weight:1000;margin-top:5px}.infoSketch{height:100%;min-height:150px}.rollCenter{text-align:center;margin:10px 0}.rollCenter button{width:100%;max-width:300px}.startCenter{text-align:center;margin-top:10px}.startCenter button{width:100%;max-width:300px}@media(max-width:520px){.sketchGrid{grid-template-columns:1fr 1fr;grid-template-areas:"one four" "nine two" "five six" "eight seven" "eight seven" "three three"}}
+
+html,body{height:100%;min-height:100%;overflow:hidden}
+body{min-height:0}
+.app{height:100dvh;max-width:1180px;margin:0 auto;padding:10px 12px;display:flex;flex-direction:column;overflow:hidden}
+.top{flex:0 0 auto;margin-bottom:8px}
+.brand{font-size:25px}
+#home{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-bottom:10px}
+.homeActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.homeAction{min-height:104px;text-align:left;padding:15px;border-radius:18px;background:linear-gradient(145deg,#172640,#0d1627);border:1px solid #334767}
+.homeAction b{display:block;font-size:17px;margin-bottom:6px}
+.homeAction small{display:block;color:#aab7cc;font-size:11px;line-height:1.4}
+#room{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:8px}
+#room>.card:first-child{margin:0;padding:10px 14px}
+#room>.card.chat{margin:0;padding:7px 10px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px}
+#room>.card.chat h3{font-size:12px;margin:0;white-space:nowrap}
+.chatList{height:38px;display:flex;overflow:auto;align-items:center}
+.chatInput{margin:0}
+.chatInput input{padding:7px 9px;font-size:12px}
+.chatInput button{padding:7px 10px;font-size:11px}
+#room>.card:last-child{display:none}
+#room .sketchGrid{min-height:0;height:100%;margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,1.2fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"mine dice opp" "actions actions actions";gap:8px}
+#myInfo{grid-area:mine}.a9{grid-area:opp}
+#myInfo,#oppInfo{min-height:0;height:100%;overflow:hidden}
+#myInfo .infoTitle,#oppInfo .infoTitle{font-size:13px}
+#myInfoBody,#oppInfoBody{overflow:hidden}
+.a1{grid-area:mine;align-self:end;display:none}.a2{grid-area:opp;align-self:end;display:none}
+.a3,.a4{display:none}
+.a5{grid-area:dice;align-self:start}.a6{grid-area:dice;align-self:center;transform:translateY(58px)}
+.a7{grid-area:dice;align-self:end}
+.a8{grid-area:mine}.a9{grid-area:opp}
+.a5,.a6,.a7{width:100%;min-height:0;height:calc((100% - 16px)/3);padding:8px}
+.a5 .value,.a6 .value{font-size:clamp(24px,5vw,42px)}
+.a7 .num{font-size:clamp(24px,5vw,36px)}
+#gameArea{grid-area:actions;margin:0;padding:8px;display:flex;align-items:center;justify-content:center;min-height:62px}
+#gameArea #normalRollWrap,#gameArea #doubleWrap,#gameArea #startWrap{width:100%;max-width:460px}
+#gameArea .codeRow{grid-template-columns:1fr 1fr}
+#gameArea button{padding:9px 12px}
+#startInfo{display:none}
+.infoRow{font-size:11px;padding:4px 0}
+#oppInfo .infoRow,#myInfo .infoRow{gap:5px}
+#oppInfo .infoRow span:last-child,#myInfo .infoRow span:last-child{max-width:52%}
+.roomHead{gap:5px}
+.turnLine{margin:5px 0 0;font-size:12px}
+.rules{gap:4px}
+.pill{font-size:9px;padding:4px 7px}
+#roomTitle{font-size:16px;margin:5px 0}
+#waitNote{padding:4px;margin:0}
+.modalShade{position:fixed;inset:0;background:#030712d9;z-index:50;display:grid;place-items:center;padding:14px}
+.modalBox{width:min(620px,100%);max-height:min(88dvh,760px);overflow:auto;background:linear-gradient(180deg,#17243b,#0b1322);border:1px solid #3a4c6d;border-radius:22px;padding:17px;box-shadow:0 24px 80px #000b}
+.modalHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.modalHead h2{margin:0;font-size:20px}
+.modalClose{padding:7px 11px}
+.modalGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.modalGrid .field{margin:4px 0}
+.passTop{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#0a1220;border:1px solid #394967;padding:12px;border-radius:15px}
+.passTrack{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:12px}
+.passTier{min-height:78px;border:1px solid #34435e;border-radius:12px;background:linear-gradient(145deg,#17243b,#0b1220);padding:7px;text-align:left}
+.passTier b{display:block;font-size:14px}.passTier small{display:block;color:#b8c4d6;font-size:9px;line-height:1.25;margin-top:5px}
+.passTier.claimed{border-color:#e8c75b;background:linear-gradient(145deg,#51421d,#1a1b24)}
+.passTier.current{box-shadow:0 0 0 2px #7e8cff}
+.kingdomPreview{height:110px;border-radius:15px;border:1px solid #8a713d;background:linear-gradient(180deg,#5c4a2e,#1c1b27 68%,#090e19);position:relative;overflow:hidden;margin:10px 0}
+.kingdomPreview:before{content:"♜     ♜      ♜";position:absolute;inset:8px 0 auto;text-align:center;font-size:28px;color:#d6b66c;letter-spacing:14px}
+.kingdomPreview:after{content:"♛";position:absolute;inset:36px 0 auto;text-align:center;font-size:52px;color:#f1d48a;text-shadow:0 4px 16px #000}
+.passColorSwatch{height:10px;border-radius:10px;margin-top:5px}
+#rankedStatus{font-size:12px;color:#cbd6e7;text-align:center;min-height:20px;margin:8px 0}
+#globalError{flex:0 0 auto;max-height:64px;overflow:auto}
+@media(max-width:600px){
+ .app{padding:7px 8px}.top{margin-bottom:5px}.brand{font-size:22px}
+ .homeActions{grid-template-columns:1fr 1fr}
+ #room{grid-template-rows:auto minmax(0,1fr) auto}
+ #room>.card:first-child{padding:7px 9px}
+ #room .sketchGrid{grid-template-columns:minmax(0,1fr) minmax(100px,.9fr) minmax(0,1fr);gap:5px}
+ #myInfo,#oppInfo{padding:8px;border-radius:12px}
+ #myInfo .infoTitle,#oppInfo .infoTitle{font-size:10px;margin-bottom:4px}
+ .infoRow{font-size:9px;padding:3px 0}
+ .a5,.a6,.a7{padding:6px;border-radius:12px}
+ .a6{transform:translateY(48px)}
+ .a5 .label,.a6 .label,.a7 .label{font-size:9px}
+ .a5 .value,.a6 .value{font-size:28px}
+ .a7 .num{font-size:25px}
+ #gameArea{min-height:55px;padding:5px}
+ #gameArea button{font-size:12px;padding:8px}
+ #room>.card.chat{grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;padding:5px 7px;gap:4px}
+ #room>.card.chat h3{grid-row:1;grid-column:1}
+ #room>.card.chat .chatList{grid-row:1;grid-column:2;height:25px}
+ #room>.card.chat .chatInput{grid-row:2;grid-column:1/3}
+ .chatInput input{padding:6px 8px}
+ .chatInput button{padding:6px 8px}
+ .passTrack{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .passTier{min-height:70px;padding:5px}
+}
+@media(max-height:620px){
+ .app{padding-top:4px;padding-bottom:4px}.top{margin-bottom:3px}
+ #room>.card:first-child{padding:5px 9px}
+ #roomTitle{margin:2px 0;font-size:14px}
+ .roomHead .playerCount{font-size:10px}
+ .turnLine{margin:2px 0 0}
+ #room>.card.chat{padding:4px 7px}
+ #room .sketchGrid{gap:4px}
+ #myInfo,#oppInfo{padding:6px}
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><div class="brand">🎲 Bölüm</div><div class="sub">Şansın hesabı vardır.</div></div>
+    <button id="hubBtn" class="ghost">HubLand</button>
+  </div>
+
+  <div id="globalError" class="error hidden"></div>
+
+  <section id="home">
+    <div class="card">
+      <h2 style="margin:0 0 5px">Bölüm Arenası</h2>
+      <div class="sub">Arkadaşınla masa kur veya dereceli eşleşmeye katıl.</div>
+      <div class="homeActions" style="margin-top:14px">
+        <button id="openCreate" class="homeAction primary"><b>＋ Masa Kur</b><small>Kuralları belirle, arkadaşını davet et.</small></button>
+        <button id="openJoin" class="homeAction"><b>⇄ Masaya Katıl</b><small>Public masaları gör veya kodla gir.</small></button>
+        <button id="rankedBtn" class="homeAction"><b>🏆 Ranked</b><small>1–6 zar · 30 pul · rakip ara.</small></button>
+        <button id="openPass" class="homeAction"><b>👑 Kingdom Falls</b><small>Pass ilerlemeni ve kozmetiklerini gör.</small></button>
+      </div>
+      <div id="rankedStatus"></div>
+      <div class="passTop" style="margin-top:10px">
+        <div><b id="passLevelHome">Kademe 1 / 60</b><div class="sub" id="passPointsHome">0 / 100 puan</div></div>
+        <div style="text-align:right"><b>Kingdom Falls</b><div class="sub">Sınırsız süreli sezon</div></div>
+      </div>
+    </div>
+    <div class="card hidden" id="joinPanel">
+      <div class="modalHead"><h2>Masaya Katıl</h2><button id="closeJoin" class="modalClose">✕</button></div>
+      <div class="codeRow"><input id="joinCode" maxlength="24" placeholder="Masa kodu"><button id="joinCodeBtn" class="primary">Katıl</button></div>
+      <h3>Public Masalar</h3><div id="tableList" class="tableList"><div class="empty">Masalar yükleniyor…</div></div>
+    </div>
+  </section>
+
+  <div id="createModal" class="modalShade hidden">
+    <div class="modalBox">
+      <div class="modalHead"><h2>Yeni Masa Kur</h2><button id="closeCreate" class="modalClose">✕</button></div>
+      <div class="modalGrid">
+        <div class="field"><label>Masa adı</label><input id="tableName" maxlength="32" placeholder="Örn. Akşam Masası"></div>
+        <div class="field"><label>Masa türü</label><select id="visibility"><option value="public">Public</option><option value="private">Private</option></select></div>
+        <div class="field"><label>En düşük zar (1–30)</label><input id="minDie" type="number" min="1" max="30" step="1" value="1"></div>
+        <div class="field"><label>En yüksek zar (1–30)</label><input id="maxDie" type="number" min="1" max="30" step="1" value="6"></div>
+        <div class="field"><label>Her tarafın pul sayısı (18–100)</label><input id="pieceCount" type="number" min="18" max="100" step="1" value="18"></div>
+        <div class="field hidden" id="codeField"><label>Private masa kodu</label><input id="tableCode" maxlength="24" placeholder="Örn. KAPI-42"></div>
+      </div>
+      <button id="createBtn" class="primary" style="width:100%;margin-top:10px">Masayı Oluştur</button>
+    </div>
+  </div>
+
+  <div id="passModal" class="modalShade hidden">
+    <div class="modalBox">
+      <div class="modalHead"><h2>👑 Kingdom Falls</h2><button id="closePass" class="modalClose">✕</button></div>
+      <div class="kingdomPreview"></div>
+      <div class="passTop"><div><b id="passLevel">Kademe 1 / 60</b><div class="sub" id="passPoints">0 / 100 puan</div></div><b id="passRewardSummary">Sarı krallık serisi</b></div>
+      <div class="sub" style="margin-top:8px">Ranked galibiyetleri daha fazla puan verir. Normal maçlar da az miktarda puan kazandırır.</div>
+      <div id="passTrack" class="passTrack"></div>
+    </div>
+  </div>
+
+  <section id="room" class="hidden">
+<div class="card"><div class="rules"><span id="roomType" class="pill"></span><span id="roomRules" class="pill"></span><span id="roomCodePill" class="pill hidden"></span></div><h2 id="roomTitle">Masa</h2><div class="roomHead"><div class="playerMini"><div id="meName" class="playerName">—</div><div id="mePiecesMini" class="playerCount">— pul</div></div><div class="versus">VS</div><div class="playerMini right"><div id="oppName" class="playerName">Bekleniyor…</div><div id="oppPiecesMini" class="playerCount">— pul</div></div></div><div class="turnLine">Tur: <span id="turnName">Başlangıç bekleniyor</span> <span id="matchBadge" class="pill" style="margin-left:6px">NORMAL</span></div><div id="matchFinished" class="empty hidden"></div><div id="waitNote" class="empty hidden">İkinci oyuncu bekleniyor…</div></div>
+<div class="sketchGrid">
+<div class="stat sketchStat a1"><div class="label">1 · Bizim pul</div><div id="myPieces" class="value">—</div></div>
+<div class="stat sketchStat a4"><div class="label">4 · Karşı tarafın aldığı</div><div id="oppTaken" class="value">0</div></div>
+<div id="oppInfo" class="infoCard infoSketch a9"><div class="infoTitle">9 · Karşı Taraf Bilgi Kartı</div><div id="oppInfoBody"></div></div>
+<div class="stat sketchStat a5"><div class="label">5 · 1. ZAR</div><div id="die1" class="value">—</div></div>
+<div class="stat sketchStat a6"><div class="label">6 · 2. ZAR</div><div id="die2" class="value">—</div></div>
+<div class="stat sketchStat a2"><div class="label">2 · Karşı tarafın pul</div><div id="oppPieces" class="value">—</div></div>
+<div id="myInfo" class="infoCard infoSketch a8 mine"><div class="infoTitle">8 · Benim Bilgi Kartım</div><div id="myInfoBody"></div></div>
+<div class="result a7" style="margin:0;height:100%;min-height:108px;display:flex;flex-direction:column;justify-content:center"><span class="label">7 · ALINAN SAYI</span><span id="resultNum" class="num">—</span><span id="resultText" class="sub">—</span></div>
+<div class="stat sketchStat a3"><div class="label">3 · Karşı taraftan aldığımız</div><div id="myTaken" class="value">0</div></div>
+</div>
+<div id="gameArea" class="card"><div id="normalRollWrap" class="rollCenter"><button id="rollBtn" class="primary">ROLL</button></div><div id="doubleWrap" class="hidden"><div class="sub" style="text-align:center;margin-bottom:7px">İkiz geldi. Birini seç:</div><div class="codeRow"><button id="doubleFix">1 Pul Al</button><button id="doubleUpgrade" class="primary">Tekrar Roll</button></div></div><div id="startWrap" class="startCenter"><button id="startRollBtn" class="primary">BAŞLANGIÇ ROLL</button></div><div id="startInfo" class="empty">İki oyuncu da başlangıç Roll’una bastığında oyun başlayacak.</div></div>
+<div class="card"><h3>10 · Oyun İşleyişi</h3><div id="log" class="log"><div class="empty">Henüz hareket yok.</div></div></div>
+<div class="card chat"><h3>💬 Masa Chat</h3><div id="chatList" class="chatList"><div class="empty">Mesaj yok.</div></div><div class="chatInput"><input id="chatInput" maxlength="500" placeholder="Mesaj yaz…"><button id="chatSend" class="primary">Gönder</button></div></div>
+<div class="card"><button id="leaveBtn" class="danger" style="width:100%">Masadan Ayrıl</button></div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let uid=null,displayName='Oyuncu',current=null,currentId=null;
+let req=0,waiting=new Map(),startLocalRolled=false;
+let isDevAccount=false, rankedMode=false, rankedSearching=false, turnStartedAt=0, turnDurations=[];
+let actionLocks={double:false,start:false,roll:false}, lastTurnUid=null;
+const PASS_ID='kingdom_falls_v1', PASS_KEY=()=>`bolum_pass_${uid||'guest'}_${PASS_ID}`;
+let passState={points:0,claimed:[],awarded:[]};
+const PASS_REWARDS={17:{type:'background',name:'Royal Hall'},39:{type:'background',name:'Throne of Ashes'},59:{type:'background',name:'Kingdom Citadel'},30:{type:'skin',name:'Broken Crown'},60:{type:'skin',name:'Golden Crown'}};
+function loadPass(){
+  try{const v=JSON.parse(localStorage.getItem(PASS_KEY())||'null');if(v&&typeof v==='object')passState={points:Number(v.points)||0,claimed:Array.isArray(v.claimed)?v.claimed:[],awarded:Array.isArray(v.awarded)?v.awarded:[]};}catch(e){}
+  if(isDevAccount){passState.points=6000;passState.claimed=Array.from({length:60},(_,i)=>i+1);savePass();}
+  updatePassUI();
+}
+function savePass(){try{localStorage.setItem(PASS_KEY(),JSON.stringify(passState));}catch(e){}}
+function passLevel(){return Math.min(60,Math.floor(passState.points/100)+1)}
+function passTierReward(n){
+  if(PASS_REWARDS[n])return PASS_REWARDS[n];
+  if(n%5===0)return {type:'color',name:`Kraliyet Sarısı ${n/5}`};
+  return {type:'points',name:'Pass ilerlemesi'};
+}
+function updatePassUI(){
+  const lvl=passLevel(),within=passState.points%100;
+  ['passLevel','passLevelHome'].forEach(id=>{if($(id))$(id).textContent=`Kademe ${lvl} / 60`});
+  ['passPoints','passPointsHome'].forEach(id=>{if($(id))$(id).textContent=`${within} / 100 puan · Toplam ${passState.points}`});
+  if($('passRewardSummary'))$('passRewardSummary').textContent=passTierReward(Math.min(60,lvl)).name;
+  if($('passTrack')){
+    $('passTrack').innerHTML='';
+    for(let n=1;n<=60;n++){
+      const r=passTierReward(n),done=passState.claimed.includes(n)||isDevAccount;
+      const b=document.createElement('button');b.className='passTier'+(done?' claimed':'')+(n===lvl?' current':'');
+      let swatch=n%5===0?`<div class="passColorSwatch" style="background:hsl(46 90% ${70-(n/5)*3}% )"></div>`:'';
+      b.innerHTML=`<b>${n}. Kademe</b><small>${esc(r.name)}</small>${swatch}`;
+      b.title=r.type==='background'||r.type==='skin'?r.name:r.name;
+      b.onclick=()=>{if(!done&&n>lvl)return;claimTier(n)};
+      $('passTrack').appendChild(b);
+    }
+  }
+}
+function claimTier(n){
+  if(n>passLevel()&&!isDevAccount)return;
+  if(!passState.claimed.includes(n))passState.claimed.push(n);
+  savePass();updatePassUI();applyMyCosmetics();
+}
+function addPassPoints(amount,reason){
+  amount=Math.max(0,Math.round(amount));if(!amount)return;
+  passState.points=Math.min(6000,passState.points+amount);
+  const newLevel=passLevel();for(let i=1;i<=newLevel;i++)if(!passState.claimed.includes(i))passState.claimed.push(i);
+  savePass();updatePassUI();err(`+${amount} pass puanı · ${reason}`);setTimeout(clearErr,2800);
+}
+function getCosmetics(){
+  const unlocked=passState.claimed;
+  const colors=unlocked.filter(n=>n%5===0).map(n=>({tier:n,color:`hsl(46 90% ${70-(n/5)*3}%)`}));
+  const backgrounds=Object.entries(PASS_REWARDS).filter(([n,r])=>r.type==='background'&&(unlocked.includes(Number(n))||isDevAccount)).map(([n,r])=>({tier:Number(n),name:r.name}));
+  const skins=Object.entries(PASS_REWARDS).filter(([n,r])=>r.type==='skin'&&(unlocked.includes(Number(n))||isDevAccount)).map(([n,r])=>({tier:Number(n),name:r.name}));
+  return {colors,backgrounds,skins,selectedColor:colors.at(-1)?.color||null,selectedBackground:backgrounds.at(-1)?.name||null,selectedSkin:skins.at(-1)?.name||null};
+}
+function applyMyCosmetics(){
+  const me=findMe();if(!me)return;
+  const c=getCosmetics();
+  $('myInfo').style.borderColor=c.selectedColor||'#5c55b9';
+  $('myInfo').style.backgroundImage=c.selectedBackground?`linear-gradient(180deg,#4a3a20aa,#101827ee)`:''; 
+  $('myInfo').dataset.skin=c.selectedSkin||'';
+  const oc=oppCosmeticFor(findOpp());
+  $('oppInfo').style.borderColor=oc?.selectedColor||'#26334c';
+  $('oppInfo').style.backgroundImage=oc?.selectedBackground?`linear-gradient(180deg,#4a3a20aa,#101827ee)`:''; 
+  $('oppInfo').dataset.skin=oc?.selectedSkin||'';
+}
+function oppCosmeticFor(p){return p?.cosmetics||p?.bolumCosmetics||null;}
+function publishMyCosmetics(){rpc('SET_BOLUM_COSMETICS',{cosmetics:getCosmetics()}).catch(()=>{});}
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function err(msg){$('globalError').textContent=msg;$('globalError').classList.remove('hidden')}
+function clearErr(){$('globalError').classList.add('hidden')}
+function rpc(op,data={}){
+  return new Promise((resolve,reject)=>{
+    const id='b'+(++req)+'_'+Date.now();waiting.set(id,{resolve,reject});
+    parent.postMessage({type:'BOLUM_REQUEST',requestId:id,op,data},'*');
+    setTimeout(()=>{if(waiting.has(id)){waiting.delete(id);reject(new Error('HubLand yanıt vermedi.'))}},12000);
+  })
+}
+window.addEventListener('message',e=>{
+  const d=e.data||{};
+  if(d.type==='HUBLAND_AUTH_CONTEXT'){
+    uid=d.uid||null;displayName=d.displayName||'Oyuncu';isDevAccount=!!(d.isDev||d.isAdmin||['dev','admin'].includes(String(d.role||'').toLowerCase()));loadPass();
+    if(!uid)err('HubLand hesabı alınamadı. Bölüm\'ü HubLand içinden aç.');
+    else clearErr();
+  }else if(d.type==='BOLUM_RESPONSE'){
+    const p=waiting.get(d.requestId);if(!p)return;waiting.delete(d.requestId);d.ok?p.resolve(d.data):p.reject(new Error(d.error||'İşlem başarısız.'));
+  }else if(d.type==='BOLUM_TABLE_LIST'){renderTables(d.tables||[])}
+  else if(d.type==='BOLUM_TABLE'){const next=d.table||null;if(next?.id!==currentId){startLocalRolled=false;lastTurnUid=null;turnDurations=[];actionLocks={double:false,start:false,roll:false};}current=next;currentId=current?.id||null;if(current){rankedMode=!!current.ranked||rankedMode;rankedSearching=false;$('rankedBtn').textContent='🏆 Ranked';publishMyCosmetics();renderRoom()}else{currentId=null;showHome()}}
+  else if(d.type==='BOLUM_CHAT_LIST'){renderChat(d.messages||[])}
+});
+
+function showHome(){$('home').classList.remove('hidden');$('room').classList.add('hidden')}
+function showRoom(){$('home').classList.add('hidden');$('room').classList.remove('hidden')}
+function renderTables(tables){
+  const list=$('tableList');list.innerHTML='';
+  if(!tables.length){list.innerHTML='<div class="empty">Şu anda public masa yok.</div>';return}
+  tables.forEach(t=>{
+    const full=(t.playerUids||[]).length>=2;
+    const row=document.createElement('div');row.className='tableRow';
+    row.innerHTML='<div><b>'+esc(t.name||'Masa')+'</b><small>'+esc(t.ownerName||'Oyuncu')+' · '+t.minDie+'–'+t.maxDie+' zar · '+t.pieces+' pul · '+(t.playerUids?.length||0)+'/2</small></div><button class="primary" '+(full?'disabled':'')+'>'+ (full?'Dolu':'Katıl')+'</button>';
+    row.querySelector('button').onclick=()=>join(t.id);list.appendChild(row);
+  })
+}
+async function join(id){try{clearErr();await rpc('JOIN_TABLE',{id});await rpc('OPEN_TABLE',{id})}catch(e){err(e.message)}}
+async function joinCode(){try{clearErr();await rpc('JOIN_CODE',{code:$('joinCode').value.trim()});}catch(e){err(e.message)}}
+function validate(){
+  const name=$('tableName').value.trim(),min=Number($('minDie').value),max=Number($('maxDie').value),pieces=Number($('pieceCount').value),vis=$('visibility').value,code=$('tableCode').value.trim();
+  if(!name)return 'Masa adı boş olamaz.';
+  if(!Number.isInteger(min)||min<1||min>30)return 'En düşük zar 1–30 arasında tam sayı olmalı.';
+  if(!Number.isInteger(max)||max<1||max>30)return 'En yüksek zar 1–30 arasında tam sayı olmalı.';
+  if(max<min)return 'En yüksek zar, en düşük zardan küçük olamaz.';
+  if(!Number.isInteger(pieces)||pieces<18||pieces>100)return 'Pul sayısı 18–100 arasında tam sayı olmalı.';
+  if(vis==='private'&&code.length<3)return 'Private masa kodu en az 3 karakter olmalı.';
+  return {name,min,max,pieces,visibility:vis,code:vis==='private'?code:null}
+}
+async function create(){
+  try{clearErr();if(!uid)throw new Error('HubLand hesabı hazır değil.');const v=validate();if(typeof v==='string')throw new Error(v);const r=await rpc('CREATE_TABLE',v);await rpc('OPEN_TABLE',{id:r.id})}catch(e){err(e.message)}
+}
+function findMe(){return(current?.players||[]).find(p=>p.uid===uid)}
+function findOpp(){return(current?.players||[]).find(p=>p.uid!==uid)}
+function infoHtml(p){
+  if(!p)return '<div class="empty">Oyuncu bekleniyor…</div>';
+  return '<div class="infoRow"><span>Oyun nicki</span><span>'+esc(p.name||'Oyuncu')+'</span></div>'+
+         '<div class="infoRow"><span>Masadaki kazanılan</span><span>'+Number(p.wins||0)+'</span></div>'+
+         '<div class="infoRow"><span>Alınan pul</span><span>'+Number(p.totalTaken||0)+'</span></div>'+
+         '<div class="infoRow"><span>Kaybedilen pul</span><span>'+Number(p.totalLost||0)+'</span></div>';
+}
+function renderRoom(){
+  showRoom();
+  const ps=current.players||[],me=findMe(),opp=findOpp(),ready=ps.length===2,turnName=current.turn?(ps.find(p=>p.uid===current.turn)?.name||'Oyuncu'):'Başlangıç bekleniyor';
+  const hasStarted=!!(current.turn||current.startedAt||current.winnerUid||current.winner||current.finishedAt||current.status==='finished'||current.lastResult||(current.history||[]).length||((current.dice||[]).length===2&&current.dice.some(x=>x!=null)));
+  const finished=!!(current.winnerUid||current.winner||current.finishedAt||current.status==='finished'||(ps.length===2&&ps.some(p=>Number(p.pieces)===0)));
+  if(current.turn!==lastTurnUid){lastTurnUid=current.turn;turnStartedAt=Date.now();}
+  $('matchBadge').textContent=current.ranked||rankedMode?'RANKED':'NORMAL';
+  $('matchFinished').classList.toggle('hidden',!finished);
+  $('matchFinished').textContent=finished?`Maç bitti · Kazanan: ${esc(ps.find(p=>p.uid===(current.winnerUid||current.winner))?.name||(current.winnerName)||'Belirlendi')}`:'';
+  if(finished)awardMatch(current,me);
+  $('roomTitle').textContent=current.name||'Masa';
+  $('roomType').textContent=current.visibility==='public'?'Public':'Private';
+  $('roomRules').textContent=current.minDie+'–'+current.maxDie+' zar · '+current.pieces+' pul';
+  $('roomCodePill').classList.toggle('hidden',current.visibility!=='private');$('roomCodePill').textContent=current.visibility==='private'?'Kod: '+(current.code||''):'';
+  $('meName').textContent=me?.name||displayName;$('mePiecesMini').textContent=(me?.pieces??'—')+' pul';
+  $('oppName').textContent=opp?.name||'Bekleniyor…';$('oppPiecesMini').textContent=opp?opp.pieces+' pul':'— pul';
+  $('turnName').textContent=turnName;
+  $('waitNote').classList.toggle('hidden',ready);
+  $('myPieces').textContent=me?.pieces??'—';$('oppPieces').textContent=opp?.pieces??'—';
+  $('myTaken').textContent=me?.totalTaken??0;$('oppTaken').textContent=opp?.totalTaken??0;
+  $('myInfoBody').innerHTML=infoHtml(me);$('oppInfoBody').innerHTML=infoHtml(opp);
+  $('gameArea').classList.toggle('hidden',!ready);
+  $('startWrap').classList.toggle('hidden',!ready||hasStarted||finished);
+  $('startRollBtn').disabled=!ready||startLocalRolled||!!current.turn||actionLocks.start;
+  $('startInfo').textContent=finished?'Maç tamamlandı.':hasStarted?'Oyun başladı.':(startLocalRolled?"Başlangıç Roll'un yapıldı; diğer oyuncu bekleniyor.":'İki oyuncu da başlangıç Roll’una bastığında oyun başlayacak.');
+  $('normalRollWrap').classList.toggle('hidden',!current.turn||finished);
+  $('rollBtn').disabled=current.turn!==uid||actionLocks.roll||finished;
+  const dp=!!current.lastResult?.doublePending&&current.turn===uid&&!finished;
+  $('doubleWrap').classList.toggle('hidden',!dp);
+  $('doubleFix').disabled=actionLocks.double||!dp;
+  $('doubleUpgrade').disabled=actionLocks.double||!dp;
+  $('die1').textContent=current.dice?.[0]??'—';$('die2').textContent=current.dice?.[1]??'—';applyMyCosmetics();
+  $('resultNum').textContent=current.lastResult?.amount??'—';
+  $('resultText').textContent=current.lastResult?.text||'—';
+  $('log').innerHTML=(current.history||[]).slice().reverse().map(x=>'<div class="logItem">'+esc(x)+'</div>').join('')||'<div class="empty">Henüz hareket yok.</div>';
+}
+function renderChat(messages){
+  const box=$('chatList');box.innerHTML='';
+  if(!messages.length){box.innerHTML='<div class="empty">Mesaj yok.</div>';return}
+  messages.forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.uid===uid?'mine':'');d.innerHTML='<div class="msgName">'+esc(m.name||'Oyuncu')+'</div><div>'+esc(m.text||'')+'</div>';box.appendChild(d)});
+  box.scrollTop=box.scrollHeight;
+}
+function awardMatch(match,me){
+  const matchId=match.id||match.tableId||`${match.createdAt||''}_${(match.players||[]).map(p=>p.uid).sort().join('_')}`;
+  if(passState.awarded.includes(matchId))return;
+  const winner=match.winnerUid||match.winner;
+  const won=winner===uid||match.winnerName===displayName;
+  const ranked=!!(match.ranked||rankedMode);
+  let points=2,reason='Normal maç tamamlandı';
+  if(ranked&&won){
+    const avg=turnDurations.length?turnDurations.reduce((a,b)=>a+b,0)/turnDurations.length:20;
+    points=Math.max(10,Math.min(25,Math.round(25-Math.min(30,avg)*0.5)));
+    reason='Ranked galibiyeti';
+  }else if(ranked){points=0;reason='Ranked maçı';}
+  passState.awarded.push(matchId);savePass();
+  if(points)addPassPoints(points,reason);
+  rankedMode=false;turnDurations=[];
+}
+async function startRoll(){if(actionLocks.start||startLocalRolled)return;actionLocks.start=true;startLocalRolled=true;renderRoom();try{clearErr();await rpc('START_ROLL')}catch(e){startLocalRolled=false;err(e.message)}finally{actionLocks.start=false;renderRoom()}}
+async function roll(){if(actionLocks.roll||current?.turn!==uid)return;actionLocks.roll=true;try{clearErr();if(turnStartedAt)turnDurations.push(Math.max(0,(Date.now()-turnStartedAt)/1000));await rpc('ROLL')}catch(e){err(e.message)}finally{actionLocks.roll=false;renderRoom()}}
+async function doubleFix(){if(actionLocks.double)return;actionLocks.double=true;$('doubleFix').disabled=true;$('doubleUpgrade').disabled=true;try{clearErr();await rpc('DOUBLE_FIX')}catch(e){err(e.message)}finally{actionLocks.double=false;renderRoom()}}
+async function doubleUpgrade(){if(actionLocks.double)return;actionLocks.double=true;$('doubleFix').disabled=true;$('doubleUpgrade').disabled=true;try{clearErr();await rpc('DOUBLE_UPGRADE')}catch(e){err(e.message)}finally{actionLocks.double=false;renderRoom()}}
+async function sendChat(){
+  const text=$('chatInput').value.trim();if(!text)return;
+  try{clearErr();$('chatInput').value='';await rpc('CHAT_SEND',{text})}catch(e){err(e.message)}
+}
+async function rankedSearch(){
+  if(rankedSearching){try{await rpc('RANKED_CANCEL');rankedSearching=false;$('rankedBtn').textContent='🏆 Ranked';$('rankedStatus').textContent='Eşleşme araması iptal edildi.';}catch(e){err(e.message)}return;}
+  try{
+    if(!uid)throw new Error('Ranked için HubLand hesabıyla giriş yapmalısın.');
+    rankedSearching=true;$('rankedBtn').textContent='Aramayı İptal Et';$('rankedStatus').textContent='1–6 zar ve 30 pul ile rakip aranıyor…';
+    const res=await rpc('RANKED_QUEUE',{minDie:1,maxDie:6,pieces:30});
+    if(res?.tableId){rankedMode=true;await rpc('OPEN_TABLE',{id:res.tableId});}
+    else if(res?.matched&&res.table){rankedMode=true;current=res.table;currentId=current.id;renderRoom();}
+    else $('rankedStatus').textContent='Rakip aranıyor…';
+  }catch(e){rankedSearching=false;$('rankedBtn').textContent='🏆 Ranked';$('rankedStatus').textContent='Ranked eşleşmesi şu anda başlatılamadı.';err(e.message);}
+}
+async function leave(closeAfter=false){
+  try{if(currentId)await rpc('LEAVE_TABLE');current=null;currentId=null;startLocalRolled=false;rankedMode=false;lastTurnUid=null;turnDurations=[];showHome();if(closeAfter)parent.postMessage({type:'BOLUM_CLOSE'},'*');}
+  catch(e){err(e.message)}
+}
+$('visibility').onchange=e=>$('codeField').classList.toggle('hidden',e.target.value!=='private');
+$('openCreate').onclick=()=>$('createModal').classList.remove('hidden');$('closeCreate').onclick=()=>$('createModal').classList.add('hidden');
+$('openJoin').onclick=()=>$('joinPanel').classList.toggle('hidden');$('closeJoin').onclick=()=>$('joinPanel').classList.add('hidden');
+$('openPass').onclick=()=>$('passModal').classList.remove('hidden');$('closePass').onclick=()=>$('passModal').classList.add('hidden');
+$('rankedBtn').onclick=rankedSearch;
+$('createBtn').onclick=create;$('joinCodeBtn').onclick=joinCode;$('startRollBtn').onclick=startRoll;$('rollBtn').onclick=roll;
+$('doubleFix').onclick=doubleFix;$('doubleUpgrade').onclick=doubleUpgrade;$('chatSend').onclick=sendChat;$('chatInput').onkeydown=e=>{if(e.key==='Enter')sendChat()};
+$('leaveBtn').onclick=()=>leave(false);$('hubBtn').onclick=()=>{if(currentId)leave(true);else parent.postMessage({type:'BOLUM_CLOSE'},'*')};
+window.addEventListener('pagehide',()=>{if(currentId)parent.postMessage({type:'BOLUM_REQUEST',requestId:'bolum_exit_'+Date.now(),op:'LEAVE_TABLE',data:{}},'*')});
+window.addEventListener('load',()=>{loadPass();parent.postMessage({type:'HUBLAND_REQUEST_AUTH_CONTEXT'},'*');rpc('SUBSCRIBE_PUBLIC').catch(e=>err(e.message))});
+</script>
+</body>
+</html>
